@@ -5,7 +5,7 @@
 
 Windmill windmill;
 
-// Game »ı¼ºÀÚ: °ÔÀÓ ÃÊ±âÈ­ ¹× ±âº» ¼³Á¤
+// Game ìƒì„±ì: ê²Œì„ ì´ˆê¸°í™” ë° ê¸°ë³¸ ì„¤ì •
 Game::Game(int width, int height)
     : snake(width / 2, height / 2), width(width), height(height),
     scoreGrowth(0), scorePoison(0), scoreGate(0), maxLength(0),
@@ -13,50 +13,50 @@ Game::Game(int width, int height)
     missionBComplete(false), missionGrowthComplete(false), missionPoisonComplete(false), missionGateComplete(false), missionMaxLengthComplete(false),
     gateCreated(false), gateCreationTime(time(0)), startTime(time(0)), gameSpeed(200) {
 
-    initscr();  // ncurses ÃÊ±âÈ­
+    initscr();  // ncurses ì´ˆê¸°í™”
     cbreak();
     noecho();
-    curs_set(0);  // Ä¿¼­ ¼û±è
-    keypad(stdscr, TRUE);  // Å°ÆĞµå ÀÔ·Â È°¼ºÈ­
-    timeout(gameSpeed);  // ÃÊ±â °ÔÀÓ ¼Óµµ ¼³Á¤
+    curs_set(0);  // ì»¤ì„œ ìˆ¨ê¹€
+    keypad(stdscr, TRUE);  // í‚¤íŒ¨ë“œ ì…ë ¥ í™œì„±í™”
+    timeout(gameSpeed);  // ì´ˆê¸° ê²Œì„ ì†ë„ ì„¤ì •
 
-    win = newwin(height, width, 0, 0);  // °ÔÀÓ Ã¢ »ı¼º
-    scoreWin = newwin(7, 30, 4, width + 2); // ½ºÄÚ¾îº¸µå Ã¢ »ı¼º
-    missionWin = newwin(9, 30, 11, width + 2); // ¹Ì¼Ç Ã¢ »ı¼º
-    timeWin = newwin(3, 30, 1, width + 2); // ½Ã°£ Ã¢ »ı¼º
+    win = newwin(height, width, 0, 0);  // ê²Œì„ ì°½ ìƒì„±
+    scoreWin = newwin(7, 30, 4, width + 2); // ìŠ¤ì½”ì–´ë³´ë“œ ì°½ ìƒì„±
+    missionWin = newwin(9, 30, 11, width + 2); // ë¯¸ì…˜ ì°½ ìƒì„±
+    timeWin = newwin(3, 30, 1, width + 2); // ì‹œê°„ ì°½ ìƒì„±
 
-    srand(static_cast<unsigned int>(time(0)));  // ³­¼ö »ı¼º±â ½Ãµå ¼³Á¤
+    srand(static_cast<unsigned int>(time(0)));  // ë‚œìˆ˜ ìƒì„±ê¸° ì‹œë“œ ì„¤ì •
 
-    initializeMap();  // ¸Ê ÃÊ±âÈ­
-    initializeStage();  // ½ºÅ×ÀÌÁö ÃÊ±âÈ­
-    placeItems();  // ¾ÆÀÌÅÛ ¹èÄ¡
+    initializeMap();  // ë§µ ì´ˆê¸°í™”
+    initializeStage();  // ìŠ¤í…Œì´ì§€ ì´ˆê¸°í™”
+    placeItems();  // ì•„ì´í…œ ë°°ì¹˜
 }
 
-// Game ¼Ò¸êÀÚ: ncurses Á¾·á
+// Game ì†Œë©¸ì: ncurses ì¢…ë£Œ
 Game::~Game() {
     delwin(win);
     delwin(scoreWin);
     endwin();
 }
 
-// °ÔÀÓ ¸ŞÀÎ ·çÇÁ
+// ê²Œì„ ë©”ì¸ ë£¨í”„
 void Game::run() {
     while (true) {
-        draw();  // È­¸é ±×¸®±â
-        processInput();  // ÀÔ·Â Ã³¸®
-        update();  // »óÅÂ ¾÷µ¥ÀÌÆ®
+        draw();  // í™”ë©´ ê·¸ë¦¬ê¸°
+        processInput();  // ì…ë ¥ ì²˜ë¦¬
+        update();  // ìƒíƒœ ì—…ë°ì´íŠ¸
     }
 }
 
-// °ÔÀÓ ¿À¹ö ÇÔ¼ö
+// ê²Œì„ ì˜¤ë²„ í•¨ìˆ˜
 void Game::gameOver() {
     delwin(win);
     delwin(scoreWin);
-    endwin();  // ncurses Á¾·á
-    exit(0);  // ÇÁ·Î±×·¥ Á¾·á
+    endwin();  // ncurses ì¢…ë£Œ
+    exit(0);  // í”„ë¡œê·¸ë¨ ì¢…ë£Œ
 }
 
-// »ç¿ëÀÚ ÀÔ·Â Ã³¸®
+// ì‚¬ìš©ì ì…ë ¥ ì²˜ë¦¬
 void Game::processInput() {
     int ch = getch();
     switch (ch) {
@@ -75,7 +75,7 @@ void Game::processInput() {
     }
 }
 
-// °ÔÀÌÆ® Åë°ú ÇÔ¼ö
+// ê²Œì´íŠ¸ í†µê³¼ í•¨ìˆ˜
 void Game::moveThroughGate(const std::pair<int, int>& exitGate) {
     auto exitX = exitGate.first;
     auto exitY = exitGate.second;
@@ -84,7 +84,7 @@ void Game::moveThroughGate(const std::pair<int, int>& exitGate) {
     Direction entryDirection = snake.getDirection();
     std::vector<Direction> directions;
 
-    // ÁøÀÔ ¹æÇâ¿¡ µû¸¥ ÁøÃâ ¹æÇâ ¿ì¼±¼øÀ§ ¼³Á¤
+    // ì§„ì… ë°©í–¥ì— ë”°ë¥¸ ì§„ì¶œ ë°©í–¥ ìš°ì„ ìˆœìœ„ ì„¤ì •
     switch (entryDirection) {
     case UP:
         directions = { UP, RIGHT, LEFT, DOWN };
@@ -100,7 +100,7 @@ void Game::moveThroughGate(const std::pair<int, int>& exitGate) {
         break;
     }
 
-    // ¿ì¼±¼øÀ§ ¹æÇâ¿¡ µû¶ó »õ·Î¿î ¸Ó¸® À§Ä¡¿Í ¹æÇâ ¼³Á¤
+    // ìš°ì„ ìˆœìœ„ ë°©í–¥ì— ë”°ë¼ ìƒˆë¡œìš´ ë¨¸ë¦¬ ìœ„ì¹˜ì™€ ë°©í–¥ ì„¤ì •
     for (const auto& direction : directions) {
         switch (direction) {
         case UP:
@@ -133,7 +133,7 @@ void Game::moveThroughGate(const std::pair<int, int>& exitGate) {
         }
     }
 
-    // À¯È¿ÇÑ »õ·Î¿î ¸Ó¸® À§Ä¡°¡ ¾øÀ¸¸é °ÔÀÓ ¿À¹ö
+    // ìœ íš¨í•œ ìƒˆë¡œìš´ ë¨¸ë¦¬ ìœ„ì¹˜ê°€ ì—†ìœ¼ë©´ ê²Œì„ ì˜¤ë²„
     if (newHead == std::pair<int, int>{-1, -1}) {
         gameOver();
         return;
@@ -141,14 +141,14 @@ void Game::moveThroughGate(const std::pair<int, int>& exitGate) {
 
     snake.setHead(newHead, newDirection);
 
-    // °ÔÀÌÆ®°¡ ¹Ù¶÷°³ºñ ³»¿¡ ÀÖ´Â °æ¿ì ¹Ù¶÷°³ºñ È¸Àü ¸ØÃã
+    // ê²Œì´íŠ¸ê°€ ë°”ëŒê°œë¹„ ë‚´ì— ìˆëŠ” ê²½ìš° ë°”ëŒê°œë¹„ íšŒì „ ë©ˆì¶¤
     if (isGateInWindmill(exitGate)) {
         windmillPaused = true;
         pauseStart = time(0);
     }
 }
 
-// °ÔÀÓ »óÅÂ ¾÷µ¥ÀÌÆ®
+// ê²Œì„ ìƒíƒœ ì—…ë°ì´íŠ¸
 void Game::update() {
     static int updateCounter = 0;
     snake.update();
@@ -156,26 +156,26 @@ void Game::update() {
     time_t currentTime = time(0);
     double elapsedSeconds = difftime(currentTime, startTime);
 
-    // °ÔÀÓ ½Ã°£ ÃÊ°ú ½Ã °ÔÀÓ ¿À¹ö
+    // ê²Œì„ ì‹œê°„ ì´ˆê³¼ ì‹œ ê²Œì„ ì˜¤ë²„
     if (elapsedSeconds > 120) {
         gameOver();
     }
 
-    // ÃÖ´ë ±æÀÌ ¾÷µ¥ÀÌÆ®
+    // ìµœëŒ€ ê¸¸ì´ ì—…ë°ì´íŠ¸
     if (snake.getBody().size() > static_cast<size_t>(maxLength)) {
         maxLength = snake.getBody().size();
     }
 
-    removeOldItems();  // ¿À·¡µÈ ¾ÆÀÌÅÛ Á¦°Å
+    removeOldItems();  // ì˜¤ë˜ëœ ì•„ì´í…œ ì œê±°
 
     auto head = snake.getHead();
 
-    // º®ÀÌ³ª Àå¾Ö¹° ¶Ç´Â ÀÚ½Å°ú Ãæµ¹ ½Ã °ÔÀÓ ¿À¹ö
+    // ë²½ì´ë‚˜ ì¥ì• ë¬¼ ë˜ëŠ” ìì‹ ê³¼ ì¶©ëŒ ì‹œ ê²Œì„ ì˜¤ë²„
     if (map[head.second][head.first] == 1 || map[head.second][head.first] == 2 || snake.checkCollision()) {
         gameOver();
     }
 
-    // ¹Ù¶÷°³ºñ ÆÈ°úÀÇ Ãæµ¹ °Ë»ç
+    // ë°”ëŒê°œë¹„ íŒ”ê³¼ì˜ ì¶©ëŒ ê²€ì‚¬
     for (int i = 1; i <= windmill.length; ++i) {
         if ((map[windmill.center.second + i][windmill.center.first] == 1 && snake.isOccupying(windmill.center.first, windmill.center.second + i)) ||
             (map[windmill.center.second - i][windmill.center.first] == 1 && snake.isOccupying(windmill.center.first, windmill.center.second - i)) ||
@@ -189,13 +189,13 @@ void Game::update() {
         }
     }
 
-    // ¼ºÀå ¾ÆÀÌÅÛ ¸Ô±â
+    // ì„±ì¥ ì•„ì´í…œ ë¨¹ê¸°
     if (map[head.second][head.first] == 5) {
         snake.grow();
         map[head.second][head.first] = 0;
         scoreGrowth++;
     }
-    // µ¶ ¾ÆÀÌÅÛ ¸Ô±â
+    // ë… ì•„ì´í…œ ë¨¹ê¸°
     else if (map[head.second][head.first] == 6) {
         snake.shrink();
         map[head.second][head.first] = 0;
@@ -204,18 +204,18 @@ void Game::update() {
             gameOver();
         }
     }
-    // ¼Óµµ Áõ°¡ ¾ÆÀÌÅÛ ¸Ô±â
+    // ì†ë„ ì¦ê°€ ì•„ì´í…œ ë¨¹ê¸°
     else if (map[head.second][head.first] == 9) {
         snake.increaseSpeed();
         map[head.second][head.first] = 0;
     }
-    // ¼Óµµ °¨¼Ò ¾ÆÀÌÅÛ ¸Ô±â
+    // ì†ë„ ê°ì†Œ ì•„ì´í…œ ë¨¹ê¸°
     else if (map[head.second][head.first] == 10) {
         snake.decreaseSpeed();
         map[head.second][head.first] = 0;
     }
 
-    // °ÔÀÌÆ® Åë°ú
+    // ê²Œì´íŠ¸ í†µê³¼
     if (head == gateA) {
         moveThroughGate(gateB);
         scoreGate++;
@@ -225,16 +225,16 @@ void Game::update() {
         scoreGate++;
     }
 
-    updateMissionStatus();  // ¹Ì¼Ç »óÅÂ ¾÷µ¥ÀÌÆ®
+    updateMissionStatus();  // ë¯¸ì…˜ ìƒíƒœ ì—…ë°ì´íŠ¸
 
-    // ¸ğµç ¹Ì¼Ç ¿Ï·á ½Ã ´ÙÀ½ ½ºÅ×ÀÌÁö·Î ÁøÇà
+    // ëª¨ë“  ë¯¸ì…˜ ì™„ë£Œ ì‹œ ë‹¤ìŒ ìŠ¤í…Œì´ì§€ë¡œ ì§„í–‰
     if (missionBComplete && missionGrowthComplete && missionPoisonComplete && missionGateComplete) {
         nextStage();
     }
 
-    placeItems();  // ¾ÆÀÌÅÛ ¹èÄ¡
+    placeItems();  // ì•„ì´í…œ ë°°ì¹˜
 
-    // ¹Ù¶÷°³ºñ È¸Àü Ã³¸® (10¹ø ¾÷µ¥ÀÌÆ®¸¶´Ù ÇÑ ¹ø¾¿ È¸Àü)
+    // ë°”ëŒê°œë¹„ íšŒì „ ì²˜ë¦¬ (10ë²ˆ ì—…ë°ì´íŠ¸ë§ˆë‹¤ í•œ ë²ˆì”© íšŒì „)
     if (currentStage == 4) {
         if (++updateCounter >= 10) {
             rotateWindmill();
@@ -242,19 +242,19 @@ void Game::update() {
         }
     }
 
-    timeout(static_cast<int>(snake.getMoveInterval() * 1000));  // ¹ìÀÇ ÀÌµ¿ °£°İ¿¡ µû¶ó timeout ¼³Á¤
+    timeout(static_cast<int>(snake.getMoveInterval() * 1000));  // ë±€ì˜ ì´ë™ ê°„ê²©ì— ë”°ë¼ timeout ì„¤ì •
 }
 
-// ¹Ì¼Ç »óÅÂ ¾÷µ¥ÀÌÆ®
+// ë¯¸ì…˜ ìƒíƒœ ì—…ë°ì´íŠ¸
 void Game::updateMissionStatus() {
     missionBComplete = (snake.getBody().size() >= static_cast<size_t>(missionB));
     missionGrowthComplete = (scoreGrowth >= missionGrowth);
     missionPoisonComplete = (scorePoison >= missionPoison);
     missionGateComplete = (scoreGate >= missionGate);
-    missionMaxLengthComplete = (maxLength >= missionMaxLength);  // ÃÖ´ë µµ´Ş ±æÀÌ ¹Ì¼Ç ¿Ï·á Á¶°Ç Ãß°¡
+    missionMaxLengthComplete = (maxLength >= missionMaxLength);  // ìµœëŒ€ ë„ë‹¬ ê¸¸ì´ ë¯¸ì…˜ ì™„ë£Œ ì¡°ê±´ ì¶”ê°€
 }
 
-// ´ÙÀ½ ½ºÅ×ÀÌÁö·Î ÁøÇà
+// ë‹¤ìŒ ìŠ¤í…Œì´ì§€ë¡œ ì§„í–‰
 void Game::nextStage() {
     currentStage++;
 
@@ -267,7 +267,7 @@ void Game::nextStage() {
     }
 }
 
-// ÃÊ±â ¸Ê ¼³Á¤
+// ì´ˆê¸° ë§µ ì„¤ì •
 void Game::initializeMap() {
     map = std::vector<std::vector<int>>(height, std::vector<int>(width, 0));
     for (int i = 0; i < width; ++i) {
@@ -285,7 +285,7 @@ void Game::initializeMap() {
     map[height - 1][width - 1] = 2;
 }
 
-// ½ºÅ×ÀÌÁö ÃÊ±âÈ­
+// ìŠ¤í…Œì´ì§€ ì´ˆê¸°í™”
 void Game::initializeStage() {
     for (int y = 0; y < height; ++y) {
         for (int x = 0; x < width; ++x) {
@@ -296,13 +296,13 @@ void Game::initializeStage() {
     }
 
     if (currentStage == 2) {
-        int startX = 15;  // ¤¡ÀÚ °¡·Î¼± ½ÃÀÛ ÁöÁ¡
-        int startY = height - 15; // ¤¡ÀÚ ¼¼·Î¼± ½ÃÀÛ ÁöÁ¡
+        int startX = 15;  // ã„±ì ê°€ë¡œì„  ì‹œì‘ ì§€ì 
+        int startY = height - 15; // ã„±ì ì„¸ë¡œì„  ì‹œì‘ ì§€ì 
         for (int i = startY; i < height - 5; ++i) {
-            map[i][startX] = 1;  // ¤¡ÀÚ ¼¼·Î¼±
+            map[i][startX] = 1;  // ã„±ì ì„¸ë¡œì„ 
         }
         for (int i = 5; i < startX; ++i) {
-            map[startY][i] = 1;  // ¤¡ÀÚ °¡·Î¼±
+            map[startY][i] = 1;  // ã„±ì ê°€ë¡œì„ 
         }
     }
     else if (currentStage == 3) {
@@ -313,19 +313,25 @@ void Game::initializeStage() {
     }
     else if (currentStage == 4) {
         initializeWindmill();
-        snake = Snake(width - 5, 1);  // ¹ìÀ» ¿À¸¥ÂÊ »ó´Ü¿¡¼­ ½ÃÀÛÇÏµµ·Ï ¼³Á¤
-        snake.changeDirection(DOWN);  // ½ÃÀÛ ¹æÇâÀ» ¾Æ·¡·Î ¼³Á¤
+        snake = Snake(width - 5, 1);  // ë±€ì„ ì˜¤ë¥¸ìª½ ìƒë‹¨ì—ì„œ ì‹œì‘í•˜ë„ë¡ ì„¤ì •
+        snake.changeDirection(DOWN);  // ì‹œì‘ ë°©í–¥ì„ ì•„ë˜ë¡œ ì„¤ì •
     }
+
+    // ë¯¸ì…˜ ë‚œì´ë„ ì¡°ì •
+       missionB += 3;
+       missionGrowth += 2;
+       missionPoison += 1;
+       missionGate += 1;
 }
 
-// È­¸é ±×¸®±â
+// í™”ë©´ ê·¸ë¦¬ê¸°
 void Game::draw() {
     werase(win);
     werase(scoreWin);
     werase(missionWin);
     werase(timeWin);
 
-    // ½ºÅ×ÀÌÁö ¹øÈ£ Ç¥½Ã
+    // ìŠ¤í…Œì´ì§€ ë²ˆí˜¸ í‘œì‹œ
     mvprintw(0, width + 5, "Stage %d", currentStage);
 
     time_t currentTime = time(0);
@@ -350,10 +356,10 @@ void Game::draw() {
             else if (map[y][x] == 7) {
                 mvwaddch(win, y, x, 'G');
             }
-            else if (map[y][x] == 9) {  // ¼Óµµ Áõ°¡ ¾ÆÀÌÅÛ
+            else if (map[y][x] == 9) {  // ì†ë„ ì¦ê°€ ì•„ì´í…œ
                 mvwaddch(win, y, x, '>');
             }
-            else if (map[y][x] == 10) {  // ¼Óµµ °¨¼Ò ¾ÆÀÌÅÛ
+            else if (map[y][x] == 10) {  // ì†ë„ ê°ì†Œ ì•„ì´í…œ
                 mvwaddch(win, y, x, '<');
             }
         }
@@ -371,11 +377,11 @@ void Game::draw() {
     mvwprintw(scoreWin, 4, 1, "-: %d", scorePoison);
     mvwprintw(scoreWin, 5, 1, "G: %d", scoreGate);
 
-    // ¹Ì¼Ç Å×µÎ¸® ±×¸®±â
+    // ë¯¸ì…˜ í…Œë‘ë¦¬ ê·¸ë¦¬ê¸°
     box(timeWin, 0, 0);
     mvwprintw(timeWin, 1, 1, "Time: %02d:%02d", minutes, seconds);
 
-    //draw ºÎºĞ
+    //draw ë¶€ë¶„
         box(missionWin, 0, 0);
     mvwprintw(missionWin, 1, 1, "Mission");
     mvwprintw(missionWin, 2, 1, "Pass the stage in 2 minutes");
@@ -392,11 +398,11 @@ void Game::draw() {
     wrefresh(timeWin);
 }
 
-// ¾ÆÀÌÅÛ ¹èÄ¡
+// ì•„ì´í…œ ë°°ì¹˜
 void Game::placeItems() {
     time_t now = time(0);
 
-    // ¼ºÀå ¾ÆÀÌÅÛ ¹èÄ¡
+    // ì„±ì¥ ì•„ì´í…œ ë°°ì¹˜
     if (growthItems.size() < 3) {
         int x, y;
         do {
@@ -408,7 +414,7 @@ void Game::placeItems() {
         growthItemTimes.push_back(now);
     }
 
-    // µ¶ ¾ÆÀÌÅÛ ¹èÄ¡
+    // ë… ì•„ì´í…œ ë°°ì¹˜
     if (poisonItems.size() < 3) {
         int x, y;
         do {
@@ -420,7 +426,7 @@ void Game::placeItems() {
         poisonItemTimes.push_back(now);
     }
 
-    // ¼Óµµ Áõ°¡ ¾ÆÀÌÅÛ ¹èÄ¡
+    // ì†ë„ ì¦ê°€ ì•„ì´í…œ ë°°ì¹˜
     if (speedUpItems.size() < 1) {
         int x, y;
         do {
@@ -432,7 +438,7 @@ void Game::placeItems() {
         speedUpItemTimes.push_back(now);
     }
 
-    // ¼Óµµ °¨¼Ò ¾ÆÀÌÅÛ ¹èÄ¡
+    // ì†ë„ ê°ì†Œ ì•„ì´í…œ ë°°ì¹˜
     if (slowDownItems.size() < 1) {
         int x, y;
         do {
@@ -444,7 +450,7 @@ void Game::placeItems() {
         slowDownItemTimes.push_back(now);
     }
 
-    // °ÔÀÌÆ® »ı¼º Á¶°Ç Ã¼Å©
+    // ê²Œì´íŠ¸ ìƒì„± ì¡°ê±´ ì²´í¬
     if (snake.getBody().size() >= 4 && !gateCreated) {
         do {
             gateA = { rand() % width, rand() % height };
@@ -457,14 +463,14 @@ void Game::placeItems() {
         gateCreationTime = now;
         gateCreated = true;
     }
-    // °ÔÀÌÆ® Àç»ı¼º Á¶°Ç Ã¼Å©
+    // ê²Œì´íŠ¸ ì¬ìƒì„± ì¡°ê±´ ì²´í¬
     else if (gateCreated && difftime(now, gateCreationTime) >= 20) {
         if (!snake.isOccupying(gateA.first, gateA.second) && !snake.isOccupying(gateB.first, gateB.second)) {
             if (gateA.first != -1 && gateA.second != -1) {
-                map[gateA.second][gateA.first] = 1; // º®À¸·Î µÇµ¹¸²
+                map[gateA.second][gateA.first] = 1; // ë²½ìœ¼ë¡œ ë˜ëŒë¦¼
             }
             if (gateB.first != -1 && gateB.second != -1) {
-                map[gateB.second][gateB.first] = 1; // º®À¸·Î µÇµ¹¸²
+                map[gateB.second][gateB.first] = 1; // ë²½ìœ¼ë¡œ ë˜ëŒë¦¼
             }
 
             gateA = { -1, -1 };
@@ -483,11 +489,11 @@ void Game::placeItems() {
     }
 }
 
-// ¿À·¡µÈ ¾ÆÀÌÅÛ Á¦°Å
+// ì˜¤ë˜ëœ ì•„ì´í…œ ì œê±°
 void Game::removeOldItems() {
     time_t now = time(0);
 
-    // ¿À·¡µÈ ¼ºÀå ¾ÆÀÌÅÛ Á¦°Å
+    // ì˜¤ë˜ëœ ì„±ì¥ ì•„ì´í…œ ì œê±°
     for (size_t i = 0; i < growthItems.size(); ++i) {
         if (difftime(now, growthItemTimes[i]) >= 10) {
             map[growthItems[i].second][growthItems[i].first] = 0;
@@ -497,7 +503,7 @@ void Game::removeOldItems() {
         }
     }
 
-    // ¿À·¡µÈ µ¶ ¾ÆÀÌÅÛ Á¦°Å
+    // ì˜¤ë˜ëœ ë… ì•„ì´í…œ ì œê±°
     for (size_t i = 0; i < poisonItems.size(); ++i) {
         if (difftime(now, poisonItemTimes[i]) >= 10) {
             map[poisonItems[i].second][poisonItems[i].first] = 0;
@@ -507,7 +513,7 @@ void Game::removeOldItems() {
         }
     }
 
-    // ¿À·¡µÈ ¼Óµµ Áõ°¡ ¾ÆÀÌÅÛ Á¦°Å
+    // ì˜¤ë˜ëœ ì†ë„ ì¦ê°€ ì•„ì´í…œ ì œê±°
     for (size_t i = 0; i < speedUpItems.size(); ++i) {
         if (difftime(now, speedUpItemTimes[i]) > 10) {
             map[speedUpItems[i].second][speedUpItems[i].first] = 0;
@@ -517,7 +523,7 @@ void Game::removeOldItems() {
         }
     }
 
-    // ¿À·¡µÈ ¼Óµµ °¨¼Ò ¾ÆÀÌÅÛ Á¦°Å
+    // ì˜¤ë˜ëœ ì†ë„ ê°ì†Œ ì•„ì´í…œ ì œê±°
     for (size_t i = 0; i < slowDownItems.size(); ++i) {
         if (difftime(now, slowDownItemTimes[i]) > 10) {
             map[slowDownItems[i].second][slowDownItems[i].first] = 0;
@@ -528,14 +534,14 @@ void Game::removeOldItems() {
     }
 }
 
-// °ÔÀÓ »óÅÂ ÃÊ±âÈ­
+// ê²Œì„ ìƒíƒœ ì´ˆê¸°í™”
 void Game::reset() {
     if (currentStage == 4) {
-        snake = Snake(width - 5, 1);  // ¹ìÀ» ¿À¸¥ÂÊ »ó´Ü¿¡¼­ ½ÃÀÛÇÏµµ·Ï ¼³Á¤
-        snake.changeDirection(DOWN);  // ½ÃÀÛ ¹æÇâÀ» ¾Æ·¡·Î ¼³Á¤
+        snake = Snake(width - 5, 1);  // ë±€ì„ ì˜¤ë¥¸ìª½ ìƒë‹¨ì—ì„œ ì‹œì‘í•˜ë„ë¡ ì„¤ì •
+        snake.changeDirection(DOWN);  // ì‹œì‘ ë°©í–¥ì„ ì•„ë˜ë¡œ ì„¤ì •
     }
     else {
-        snake = Snake(width / 2, height / 2);  // ±âº» ¹ì Àç¹èÄ¡
+        snake = Snake(width / 2, height / 2);  // ê¸°ë³¸ ë±€ ì¬ë°°ì¹˜
     }
 
     scoreGrowth = 0;
@@ -552,14 +558,14 @@ void Game::reset() {
     gateA = { -1, -1 };
     gateB = { -1, -1 };
 
-    startTime = time(0);  // ½ºÅ×ÀÌÁö ½ÃÀÛ ½Ã°£ ÃÊ±âÈ­
+    startTime = time(0);  // ìŠ¤í…Œì´ì§€ ì‹œì‘ ì‹œê°„ ì´ˆê¸°í™”
 
     initializeMap();
     initializeStage();
     placeItems();
 }
 
-// ¹Ù¶÷°³ºñ ÃÊ±âÈ­
+// ë°”ëŒê°œë¹„ ì´ˆê¸°í™”
 void Game::initializeWindmill() {
     windmill.center = { width / 2, height / 2 };
     windmill.length = 5;
@@ -571,21 +577,21 @@ void Game::initializeWindmill() {
     }
 }
 
-// ¹Ù¶÷°³ºñ È¸Àü
+// ë°”ëŒê°œë¹„ íšŒì „
 void Game::rotateWindmill() {
     static bool windmillPaused = false;
     static time_t pauseStart;
 
     if (windmillPaused) {
-        if (difftime(time(0), pauseStart) >= 1) {  // 1ÃÊ ´ë±â ÈÄ È¸Àü Àç°³
+        if (difftime(time(0), pauseStart) >= 1) {  // 1ì´ˆ ëŒ€ê¸° í›„ íšŒì „ ì¬ê°œ
             windmillPaused = false;
         }
         else {
-            return;  // ¾ÆÁ÷ ´ë±â ÁßÀÌ¸é È¸ÀüÇÏÁö ¾ÊÀ½
+            return;  // ì•„ì§ ëŒ€ê¸° ì¤‘ì´ë©´ íšŒì „í•˜ì§€ ì•ŠìŒ
         }
     }
 
-    windmill.state = (windmill.state + 1) % 8;  // 8°³ »óÅÂ·Î ¼øÈ¯ (45µµ¾¿ È¸Àü)
+    windmill.state = (windmill.state + 1) % 8;  // 8ê°œ ìƒíƒœë¡œ ìˆœí™˜ (45ë„ì”© íšŒì „)
 
     for (int i = 1; i <= windmill.length; ++i) {
         map[windmill.center.second + i][windmill.center.first] = 0;
@@ -599,49 +605,49 @@ void Game::rotateWindmill() {
     }
 
     switch (windmill.state) {
-    case 0:  // 0µµ
+    case 0:  // 0ë„
         for (int i = 1; i <= windmill.length; ++i) {
             map[windmill.center.second + i][windmill.center.first] = 1;
             map[windmill.center.second - i][windmill.center.first] = 1;
         }
         break;
-    case 1:  // 45µµ
+    case 1:  // 45ë„
         for (int i = 1; i <= windmill.length; ++i) {
             map[windmill.center.second + i][windmill.center.first + i] = 1;
             map[windmill.center.second - i][windmill.center.first - i] = 1;
         }
         break;
-    case 2:  // 90µµ
+    case 2:  // 90ë„
         for (int i = 1; i <= windmill.length; ++i) {
             map[windmill.center.second][windmill.center.first + i] = 1;
             map[windmill.center.second][windmill.center.first - i] = 1;
         }
         break;
-    case 3:  // 135µµ
+    case 3:  // 135ë„
         for (int i = 1; i <= windmill.length; ++i) {
             map[windmill.center.second + i][windmill.center.first - i] = 1;
             map[windmill.center.second - i][windmill.center.first + i] = 1;
         }
         break;
-    case 4:  // 180µµ
+    case 4:  // 180ë„
         for (int i = 1; i <= windmill.length; ++i) {
             map[windmill.center.second - i][windmill.center.first] = 1;
             map[windmill.center.second + i][windmill.center.first] = 1;
         }
         break;
-    case 5:  // 225µµ
+    case 5:  // 225ë„
         for (int i = 1; i <= windmill.length; ++i) {
             map[windmill.center.second - i][windmill.center.first - i] = 1;
             map[windmill.center.second + i][windmill.center.first + i] = 1;
         }
         break;
-    case 6:  // 270µµ
+    case 6:  // 270ë„
         for (int i = 1; i <= windmill.length; ++i) {
             map[windmill.center.second][windmill.center.first - i] = 1;
             map[windmill.center.second][windmill.center.first + i] = 1;
         }
         break;
-    case 7:  // 315µµ
+    case 7:  // 315ë„
         for (int i = 1; i <= windmill.length; ++i) {
             map[windmill.center.second - i][windmill.center.first + i] = 1;
             map[windmill.center.second + i][windmill.center.first - i] = 1;
@@ -651,7 +657,7 @@ void Game::rotateWindmill() {
 }
 
 
-// ¹Ù¶÷°³ºñ¿Í °ÔÀÌÆ®°¡ °ãÄ¡´ÂÁö È®ÀÎ
+// ë°”ëŒê°œë¹„ì™€ ê²Œì´íŠ¸ê°€ ê²¹ì¹˜ëŠ”ì§€ í™•ì¸
 bool Game::isGateInWindmill(const std::pair<int, int>& gate) {
     int x = gate.first;
     int y = gate.second;
@@ -659,7 +665,7 @@ bool Game::isGateInWindmill(const std::pair<int, int>& gate) {
     int cy = windmill.center.second;
     int length = windmill.length;
 
-    // ¹Ù¶÷°³ºñÀÇ ÆÈ À§Ä¡¿Í °ãÄ¡´ÂÁö È®ÀÎ
+    // ë°”ëŒê°œë¹„ì˜ íŒ” ìœ„ì¹˜ì™€ ê²¹ì¹˜ëŠ”ì§€ í™•ì¸
     if ((x == cx && abs(y - cy) <= length) ||
         (y == cy && abs(x - cx) <= length) ||
         (abs(x - cx) <= length && abs(y - cy) <= length)) {
